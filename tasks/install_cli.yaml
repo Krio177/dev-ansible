@@ -1,0 +1,50 @@
+---
+- name: Szükséges programok telepítése Arch Linuxon
+  hosts: localhost
+  connection: local
+  become: true
+  vars:
+    pacman_packages:
+      - yazi
+      - tmux
+      - php
+      - npm
+      - go
+      - rust
+      - fish
+    aur_packages:
+      - github-copilot-cli
+      - bluetui
+  tasks:
+    - name: Pacman frissítés
+      community.general.pacman:
+        update_cache: true
+        upgrade: true
+
+    - name: Hivatalos repo csomagok telepítése
+      community.general.pacman:
+        name: "{{ pacman_packages }}"
+        state: present
+
+    - name: Ellenőrizzük hogy a yay telepítve van-e
+      ansible.builtin.stat:
+        path: /usr/bin/yay
+      register: yay_check
+
+    - name: Telepítsük a yay-t (ha nincs fenn)
+      become: false
+      ansible.builtin.shell: |
+        cd /tmp
+        git clone https://aur.archlinux.org/yay.git
+        cd yay
+        makepkg -si --noconfirm
+      args:
+        creates: /usr/bin/yay
+      when: not yay_check.stat.exists
+
+    - name: AUR csomagok telepítése yay-el
+      become: false
+      ansible.builtin.command: yay -S --noconfirm {{ item }}
+      loop: "{{ aur_packages }}"
+      environment:
+        PATH: "/usr/bin:{{ ansible_env.PATH }}"

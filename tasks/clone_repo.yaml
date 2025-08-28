@@ -1,0 +1,41 @@
+
+---
+- name: Több dotfiles repo kezelése (minden fájl másolása)
+  hosts: localhost
+  connection: local
+  vars:
+    dotfiles_repos:
+      - name: "nvim"
+        repo: "https://github.com/Krio177/personal.nvim"
+        dest: "{{ ansible_env.HOME }}/.local/dotfiles/nvim"
+        version: master
+        target: "{{ ansible_env.HOME }}/.config/nvim"
+
+      - name: "tmux"
+        repo: "https://github.com/Krio177/tmux"
+        dest: "{{ ansible_env.HOME }}/.local/dotfiles/tmux"
+        version: main
+        target: "{{ ansible_env.HOME }}/.config/tmux"
+
+  tasks:
+    - name: Dotfiles repo klónozása/frissítése
+      ansible.builtin.git:
+        repo: "{{ item.repo }}"
+        dest: "{{ item.dest }}"
+        version: "{{ item.version }}"
+        force: yes
+      loop: "{{ dotfiles_repos }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Teljes repo tartalmának másolása a célba
+      ansible.builtin.copy:
+        src: "{{ item.dest }}/"
+        dest: "{{ item.target }}/"
+        owner: "{{ ansible_env.USER }}"
+        group: "{{ ansible_env.USER }}"
+        mode: "0644"
+        force: yes
+      loop: "{{ dotfiles_repos }}"
+      loop_control:
+        label: "{{ item.name }}"
