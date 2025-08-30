@@ -12,9 +12,18 @@
       - go
       - rust
       - fish
+      - snap
+      - yubikey-personalization
+      - browsh
+      - kubectl
+      - k9s
     aur_packages:
-      - github-copilot-cli
       - bluetui
+      - clipse
+      # - snapd
+      - appimagelauncher
+      - thunderbird
+      - phpstorm
   tasks:
     - name: Pacman frissítés
       community.general.pacman:

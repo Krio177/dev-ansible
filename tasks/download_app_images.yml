@@ -1,0 +1,41 @@
+---
+- name: AppImage-ek letöltése
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  
+  vars:
+    appimages:
+      - url: "https://github.com/neovide/neovide/releases/latest/download/neovide.AppImage"
+        dest: "~/AppImage/neovide.AppImage"
+      - url: "https://api.k8slens.dev/binaries/Lens-2025.8.121212-latest.x86_64.AppImage"
+        dest: "~/AppImage/Lens.AppImage"
+      - url: "https://github.com/nextcloud-releases/desktop/releases/download/v3.17.1/Nextcloud-3.17.1-x86_64.AppImage"
+        dest: "~/AppImage/Nextcloud.AppImage"
+      - url: "https://github.com/mockoon/mockoon/releases/download/v9.3.0/mockoon-9.3.0.x86_64.AppImage"
+        dest: "~/AppImage/Mockoon.AppImage"
+      - url: "https://github.com/johannesjo/super-productivity/releases/latest/download/superProductivity-x86_64.AppImage"
+        dest: "~/AppImage/SuperProductivity.AppImage"
+  tasks:
+    - name: AppImage könyvtár létrehozása
+      ansible.builtin.file:
+        path: "~/AppImage"
+        state: directory
+        mode: '0755'
+
+    - name: AppImage-ek letöltése
+      ansible.builtin.get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+        mode: '0755'
+        force: true
+      loop: "{{ appimages }}"
+      register: download_result
+      retries: 3
+      delay: 5
+      until: download_result is success
+
+    - name: Letöltött fájlok listázása
+      ansible.builtin.debug:
+        msg: "Letöltve: {{ item.dest }}"
+      loop: "{{ appimages }}"

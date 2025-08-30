@@ -16,7 +16,11 @@
         dest: "{{ ansible_env.HOME }}/.local/dotfiles/tmux"
         version: main
         target: "{{ ansible_env.HOME }}/.config/tmux"
-
+      - name: "yazi"
+        repo: "https://github.com/Krio177/yazi"
+        dest: "{{ ansible_env.HOME }}/.local/dotfiles/yazi"
+        version: main
+        target: "{{ ansible_env.HOME }}/.config/yazi"
   tasks:
     - name: Dotfiles repo klónozása/frissítése
       ansible.builtin.git:
