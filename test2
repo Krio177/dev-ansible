@@ -1,2 +1,12 @@
-saasdasd
-asdasdads
+git:
+  merging:
+    # Automatikusan nyissa meg a merge tool-t konfliktus esetén
+    manualCommit: false
+    
+# Custom command a merge tool megnyitásához
+customCommands:
+  - key: 'M'
+    command: 'git mergetool {{.SelectedFile.Name}}'
+    context: 'files'
+    description: 'Open merge tool for selected file'
+    subprocess: true
